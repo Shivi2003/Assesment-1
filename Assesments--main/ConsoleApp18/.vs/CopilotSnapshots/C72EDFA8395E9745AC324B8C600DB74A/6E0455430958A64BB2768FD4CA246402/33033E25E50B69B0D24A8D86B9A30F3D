@@ -1,0 +1,42 @@
+﻿using DataModels.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace DataAccess.Data
+{
+    public class ApplicationDbContext : DbContext
+    {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        {
+        }
+
+        public DbSet<Book> Books { get; set; }
+        public DbSet<BookDetail> BookDetails { get; set; }
+
+        // Added DbSets
+        public DbSet<Author> Authors { get; set; }
+        public DbSet<Publisher> Publishers { get; set; }
+        public DbSet<BookAuthorMap> BookAuthorMaps { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            
+            modelBuilder.Entity<Book>().Property(b => b.Price).HasPrecision(18, 2);
+
+           
+            modelBuilder.Entity<BookAuthorMap>(entity =>
+            {
+                entity.HasKey(e => new { e.Book_Id, e.Author_Id });
+
+                entity.HasOne(e => e.Book)
+                    .WithMany(b => b.BookAuthorMap)
+                    .HasForeignKey(e => e.Book_Id);
+
+                entity.HasOne(e => e.Author)
+                    .WithMany(a => a.BookAuthorMap)
+                    .HasForeignKey(e => e.Author_Id);
+            });
+
+            // Additional model configuration can go here
+        }
+    }
+}

@@ -1,0 +1,55 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Models.Models;
+
+namespace DataAccess.Data
+{
+ public class ApplicationDbContext : DbContext
+ {
+ public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+ {
+ }
+
+ // Existing entity sets
+ public DbSet<Book> Books { get; set; } = null!;
+ public DbSet<BookDetail> BookDetails { get; set; } = null!;
+ public DbSet<BookAuthorMap> BookAuthorMap { get; set; } = null!;
+
+ // Added missing DbSet properties so migrations include them
+ public DbSet<Author> Author { get; set; } = null!;
+ public DbSet<Publisher> Publisher { get; set; } = null!;
+
+ protected override void OnModelCreating(ModelBuilder modelBuilder)
+ {
+ // Configure money precision
+ modelBuilder.Entity<Book>().Property(b => b.Price).HasPrecision(18,2);
+
+ // Configure explicit many-to-many mapping via BookAuthorMap (composite key + relationships)
+ modelBuilder.Entity<BookAuthorMap>(bam =>
+ {
+ bam.HasKey(x => new { x.Book_Id, x.Author_Id });
+
+ bam.HasOne(x => x.Book)
+ .WithMany(b => b.BookAuthorMaps)
+ .HasForeignKey(x => x.Book_Id);
+
+ bam.HasOne(x => x.Author)
+ .WithMany(a => a.BookAuthorMaps)
+ .HasForeignKey(x => x.Author_Id);
+ });
+
+ // One-to-one: Book <-> BookDetail (BookDetail.BookId is FK)
+ modelBuilder.Entity<Book>()
+ .HasOne(b => b.BookDetail)
+ .WithOne(d => d.Book)
+ .HasForeignKey<BookDetail>(d => d.BookId);
+
+ // One-to-many: Book -> Publisher (Book.Publisher_Id is FK)
+ modelBuilder.Entity<Book>()
+ .HasOne(b => b.Publisher)
+ .WithMany(p => p.Books)
+ .HasForeignKey(b => b.Publisher_Id);
+
+ // Keep other mappings if present
+ }
+ }
+}

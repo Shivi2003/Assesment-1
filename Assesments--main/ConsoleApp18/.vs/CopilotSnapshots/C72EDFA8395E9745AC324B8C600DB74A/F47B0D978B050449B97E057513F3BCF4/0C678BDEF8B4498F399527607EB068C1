@@ -1,0 +1,33 @@
+﻿using DataModels.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace DataAccess.Data
+{
+    public class ApplicationDbContext : DbContext
+    {
+        public DbSet<Book> Books { get; set; }
+        //public DbSet<Genere> Generes { get; set; }
+        public DbSet<BookDetail> BookDetails{ get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(
+                "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=DB;Integrated Security=True;Connect Timeout=30;Encrypt=False;");
+        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            //modelBuilder.Entity<Book>().Property(u => u.Price).HasPrecision(10, 5);
+
+            //modelBuilder.Entity<Book>().HasData(new Book { BookId = 1 ,Title="Spiderman",ISBN="123456",Price=12.3}); 
+            //modelBuilder.Entity<Book>().HasData(new Book { BookId = 2 ,Title="Superman",ISBN="333333",Price=22.3});
+            
+            //var booklist = new Book[] {
+            //     new Book { BookId = 3 ,Title="Spiderman",ISBN="123456",Price=12.3},
+            //     new Book { BookId = 4, Title = "Superman", ISBN = "333333", Price = 22.3 }
+            //};
+
+            //modelBuilder.Entity<Book>().HasData(booklist);
+
+        }
+    }
+}

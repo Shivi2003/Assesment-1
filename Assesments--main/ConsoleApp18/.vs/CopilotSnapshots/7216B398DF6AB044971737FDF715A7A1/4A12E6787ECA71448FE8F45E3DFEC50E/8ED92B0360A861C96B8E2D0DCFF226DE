@@ -1,0 +1,27 @@
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
+namespace Models.Models
+{
+ public class Book
+ {
+ public int BookId { get; set; }
+
+ [Required]
+ [StringLength(200)]
+ public string Title { get; set; } = string.Empty;
+
+ // Changed from double to decimal
+ public decimal Price { get; set; }
+
+ // FK to publisher
+ public int? Publisher_Id { get; set; }
+ public Publisher? Publisher { get; set; }
+
+ // One-to-one
+ public BookDetail? BookDetail { get; set; }
+
+ // Many-to-many via explicit join entity
+ public List<BookAuthorMap> BookAuthorMaps { get; set; } = new List<BookAuthorMap>();
+ }
+}
